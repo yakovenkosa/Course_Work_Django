@@ -1,0 +1,12 @@
+{% extends "mail/base.html" %}
+
+{% block title %}Главная страница{% endblock %}
+
+{% block content %}
+<h2>Статистика рассылок</h2>
+<ul>
+    <li>Количество созданных рассылок: {{ total_mailings }}</li>
+    <li>Запущенные рассылки: {{ active_mailings }}</li>
+    <li>Получатели: {{ unique_recipients }}</li>
+</ul>
+{% endblock %}
