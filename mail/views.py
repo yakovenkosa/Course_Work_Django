@@ -1,13 +1,17 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView, View
+from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
+                                  UpdateView, View)
+
 from mail.forms import MailingForm, MessageForm, RecipientForm
-from mail.models import Mailing, MailingAttempt, Message, Recipient, UserMailingStatistics
-from mail.servicies import get_mailing_from_cache, get_message_from_cache, get_recipient_from_cache
+from mail.models import (Mailing, MailingAttempt, Message, Recipient,
+                         UserMailingStatistics)
+from mail.servicies import (get_mailing_from_cache, get_message_from_cache,
+                            get_recipient_from_cache)
 from utils.logger import setup_logging
-from django.core.exceptions import PermissionDenied
 
 setup_logging()
 
@@ -36,7 +40,9 @@ class MailingListView(LoginRequiredMixin, ListView):
     context_object_name = "mailing_list"
 
     def get_queryset(self):
-        if self.request.user.is_superuser or self.request.user.has_permission('can_view_all_mailings'):
+        if self.request.user.is_superuser or self.request.user.has_permission(
+            "can_view_all_mailings"
+        ):
             return get_mailing_from_cache()
         else:
             user = self.request.user
@@ -124,7 +130,9 @@ class MessageListView(ListView):
     context_object_name = "message_list"
 
     def get_queryset(self):
-        if self.request.user.is_superuser or self.request.user.has_permission('can_view_all_messages'):
+        if self.request.user.is_superuser or self.request.user.has_permission(
+            "can_view_all_messages"
+        ):
             return get_message_from_cache()
         else:
             user = self.request.user
@@ -194,7 +202,9 @@ class RecipientListView(ListView):
     context_object_name = "recipient_list"
 
     def get_queryset(self):
-        if self.request.user.is_superuser or self.request.user.has_permission('can_view_all_recipients'):
+        if self.request.user.is_superuser or self.request.user.has_permission(
+            "can_view_all_recipients"
+        ):
             return get_recipient_from_cache()
         else:
             user = self.request.user
@@ -226,7 +236,9 @@ class RecipientUpdateView(LoginRequiredMixin, UpdateView):
         try:
             return super().get_object(queryset)
         except Recipient.DoesNotExist:
-            raise PermissionDenied("У Вас нет прав для редактирования этого получателя.")
+            raise PermissionDenied(
+                "У Вас нет прав для редактирования этого получателя."
+            )
 
 
 class RecipientDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
@@ -258,7 +270,9 @@ class MailingAttemptListView(ListView):
 
 class UserMailingStatisticsView(View):
     def get(self, request):
-        user_stats, created = UserMailingStatistics.objects.get_or_create(user=request.user)
+        user_stats, created = UserMailingStatistics.objects.get_or_create(
+            user=request.user
+        )
 
         return render(request, "mail/user_statistics.html", {"user_stats": user_stats})
 

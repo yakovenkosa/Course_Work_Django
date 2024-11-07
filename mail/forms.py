@@ -1,4 +1,5 @@
 from django import forms
+
 from .models import Mailing, Message, Recipient
 
 
@@ -41,4 +42,3 @@ class MailingForm(forms.ModelForm):
             "start_time": forms.DateTimeInput(attrs={"type": "datetime-local"}),
             "end_time": forms.DateTimeInput(attrs={"type": "datetime-local"}),
         }
-        

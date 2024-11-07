@@ -1,7 +1,6 @@
 import random
 import string
 
-from config.settings import EMAIL_HOST_USER
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login, update_session_auth_hash
@@ -15,6 +14,8 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView
+
+from config.settings import EMAIL_HOST_USER
 from users.forms import RegisterUserCreationForm
 from users.models import CustomUser
 
@@ -96,7 +97,9 @@ class PasswordResetView(View):
         email = request.POST.get("email")
         try:
             user = CustomUser.objects.get(email=email)
-            new_password = "".join(random.choices(string.ascii_letters + string.digits, k=8))
+            new_password = "".join(
+                random.choices(string.ascii_letters + string.digits, k=8)
+            )
             user.password = make_password(new_password)
             user.save()
             send_mail(

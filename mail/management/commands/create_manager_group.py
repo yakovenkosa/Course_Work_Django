@@ -14,7 +14,10 @@ class Command(BaseCommand):
         group, created = Group.objects.get_or_create(name=group_name)
 
         if created:
-            self.stdout.write(self.style.SUCCESS(f'Группа "{group_name}" была успешно создана!'))
+            self.stdout.write(
+                self.style.SUCCESS(f'Группа "{group_name}" была успешно создана!')
+            )
         else:
-            self.stdout.write(self.style.WARNING(f'Группа "{group_name}" уже существует.'))
-            
+            self.stdout.write(
+                self.style.WARNING(f'Группа "{group_name}" уже существует.')
+            )

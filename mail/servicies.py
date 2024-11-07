@@ -1,5 +1,6 @@
-from config.settings import CACHE_ENABLED
 from django.core.cache import cache
+
+from config.settings import CACHE_ENABLED
 from mail.models import Mailing, Message, Recipient
 
 

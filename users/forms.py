@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
+
 from users.models import CustomUser
 
 
@@ -61,7 +62,8 @@ class RegisterUserCreationForm(UserCreationForm):
 
         if not avatar.name.endswith(("jpg", "jpeg", "png")):
             raise forms.ValidationError(
-                "Формат файла не соответствует требованиям. " "Формат файла должен быть *.jpg, *.jpeg, *.png"
+                "Формат файла не соответствует требованиям. "
+                "Формат файла должен быть *.jpg, *.jpeg, *.png"
             )
 
         return avatar

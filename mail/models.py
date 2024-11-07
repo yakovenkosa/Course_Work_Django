@@ -1,17 +1,24 @@
 import logging
-from config import settings
-from django.db import models
-from users.models import CustomUser
+
 from django.core.mail import BadHeaderError, send_mail
+from django.db import models
 from django.utils import timezone
-from utils.logger import setup_logging
+
+from config import settings
+from users.models import CustomUser
 
 
 class Recipient(models.Model):
     email = models.EmailField(unique=True)
     full_name = models.CharField(max_length=100)
     comment = models.TextField(blank=True)
-    owner = models.ForeignKey(CustomUser, verbose_name="Владелец", blank=True, null=True, on_delete=models.SET_NULL,)
+    owner = models.ForeignKey(
+        CustomUser,
+        verbose_name="Владелец",
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
 
     def __str__(self):
         return self.full_name
@@ -28,7 +35,13 @@ class Recipient(models.Model):
 class Message(models.Model):
     subject = models.CharField(max_length=150)
     body = models.TextField()
-    owner = models.ForeignKey(CustomUser, verbose_name="Владелец", blank=True, null=True, on_delete=models.SET_NULL,)
+    owner = models.ForeignKey(
+        CustomUser,
+        verbose_name="Владелец",
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
 
     def __str__(self):
         return self.subject
@@ -49,12 +62,22 @@ class Mailing(models.Model):
         ("Завершена", "Завершена"),
     ]
 
-    first_send_time = models.DateTimeField(null=True, blank=True, help_text="укажите время по формату 2023-10-01 12:00")
-    end_time = models.DateTimeField(null=True, blank=True, help_text="укажите время по формату 2023-10-01 12:00")
+    first_send_time = models.DateTimeField(
+        null=True, blank=True, help_text="укажите время по формату 2023-10-01 12:00"
+    )
+    end_time = models.DateTimeField(
+        null=True, blank=True, help_text="укажите время по формату 2023-10-01 12:00"
+    )
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="Создана")
     message = models.ForeignKey(Message, on_delete=models.CASCADE)
     recipients = models.ManyToManyField(Recipient)
-    owner = models.ForeignKey(CustomUser, verbose_name="Владелец", blank=True, null=True, on_delete=models.SET_NULL,)
+    owner = models.ForeignKey(
+        CustomUser,
+        verbose_name="Владелец",
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
     is_blocked = models.BooleanField(default=False)
 
     def __str__(self):
@@ -62,7 +85,9 @@ class Mailing(models.Model):
 
     def send_mailing(self):
         """Отправка сообщений всем получателям и логирование попыток отправки"""
-        user_stats, created = UserMailingStatistics.objects.get_or_create(user=self.owner)
+        user_stats, created = UserMailingStatistics.objects.get_or_create(
+            user=self.owner
+        )
         if self.is_blocked:
             logging.info(f"Рассылка {self.pk} заблокирована.")
             return
@@ -152,7 +177,13 @@ class MailingAttempt(models.Model):
     status = models.CharField(max_length=10, choices=ATTEMPT_STATUS_CHOICES)
     server_response = models.TextField(blank=True)
     mailing = models.ForeignKey(Mailing, on_delete=models.CASCADE)
-    owner = models.ForeignKey(CustomUser, verbose_name="Владелец", blank=True, null=True, on_delete=models.SET_NULL,)
+    owner = models.ForeignKey(
+        CustomUser,
+        verbose_name="Владелец",
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
 
     def __str__(self):
         return f"Попытка: {self.status} at {self.attempt_datetime}"
@@ -163,6 +194,7 @@ class MailingAttempt(models.Model):
         permissions = [
             ("can_view_all_mailings_attempts", "can view all mailings attempts"),
         ]
+
 
 class UserMailingStatistics(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)

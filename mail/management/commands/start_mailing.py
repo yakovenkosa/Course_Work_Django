@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand
+
 from mail.models import Mailing
 
 
@@ -13,11 +14,17 @@ class Command(BaseCommand):
         try:
             mailing = Mailing.objects.get(pk=mailing_id)
         except Mailing.DoesNotExist:
-            self.stderr.write(self.style.ERROR(f"Mailing with id {mailing_id} not found."))
+            self.stderr.write(
+                self.style.ERROR(f"Mailing with id {mailing_id} not found.")
+            )
             return
 
         if mailing.status != "Создана":
-            self.stderr.write(self.style.ERROR(f'Mailing with id {mailing_id} is not in "Создана" status.'))
+            self.stderr.write(
+                self.style.ERROR(
+                    f'Mailing with id {mailing_id} is not in "Создана" status.'
+                )
+            )
             return
 
         mailing.send_mailing()
