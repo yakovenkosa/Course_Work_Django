@@ -1,0 +1,66 @@
+version: '3'
+
+services:
+
+  redis:
+    image: redis:latest
+    restart: on-failure
+  db:
+    image: postgres
+    restart: on-failure
+    volumes:
+      - pg_data:/var/lib/postgresql/data/pgdata
+    env_file:
+      - .env
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    tty: true
+    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    tty: true
+    command: celery -A config worker -l info
+    restart: on-failure
+    depends_on:
+      - redis
+      - db
+      - app
+    env_file:
+      - .env
+
+  celery-beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    tty: true
+    command: celery -A config beat -l info
+    restart: on-failure
+    depends_on:
+      - redis
+      - db
+      - app
+    env_file:
+      - .env
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/html:/usr/share/nginx/html
+
+volumes:
+  pg_data:
