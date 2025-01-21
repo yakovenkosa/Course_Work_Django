@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -32,6 +33,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "mail",
     "users",
+    "django_celery_beat",
 ]
 
 MIDDLEWARE = [
@@ -146,3 +148,20 @@ if CACHE_ENABLED:
             "LOCATION": "redis://redis:6379/1",
         }
     }
+
+CELERY_BROKER_URL = "redis://redis:6379"
+
+CELERY_RESULT_BACKEND = "redis://redis:6379"
+
+CELERY_TIMEZONE = TIME_ZONE
+
+CELERY_TASK_TRACK_STARTED = True
+
+CELERY_TASK_TIME_LIMIT = 30 * 60
+
+CELERY_BEAT_SCHEDULE = {
+    "update_notification_email": {
+        "task": "habit_tracker_app_project.habit_tracker.tasks.telegram_notification",
+        "schedule": timedelta(hours=12),
+    },
+}
